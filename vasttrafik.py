@@ -6,38 +6,9 @@ import numpy as np
 from matplotlib import pyplot as plt
 import pandas as pd
 import seaborn as sb
+import vv_helpers as vv
 
-def monthyear_from_number(number, monthslist, start_year, start_month):
-    """Convert a Year-Month index number to a string of form 'Month-Year' (%b-%Y format datetime)"""
-    year = start_year + math.floor((number+start_month)/12)
-    month = monthslist[ (number+start_month) % 12]
-    return str(month)+" "+ str(year)
-
-def year_from_monthyear(monthyear, month, start_year, start_month):
-    """Convert a Year-Month index number to a year Integer."""
-    actual_year = np.floor( (monthyear - (month-start_month) )/12) + start_year
-    return actual_year
-
-def month_from_monthyear(monthyear, year, start_year, start_month):
-    """Convert a Year-Month index number to a month Integer."""
-    actual_month = monthyear - 12*(year -start_year) + start_month
-    return actual_month
-
-# Read CSV file
-df = pd.read_csv("tickets_automated.csv", header=0)
-df['SEK'] = df['SEK'].fillna(0)
-df.head()
-# change date column datatype to datetime
-df['datetime'] = pd.to_datetime(df['datetime'])
-# remove duplicate entries
-df.drop_duplicates("datetime", inplace=True)
-df.head()
-# set datetime column as index
-df.set_index("datetime", inplace=True)
-# drop unnecessary old index
-df.drop("Unnamed: 0", axis=1, inplace=True)
-# show start of the data
-df.head(-100)
+df = vv.read_ticket_data("tickets_automated.csv")
 
 # extract startYear and startMonth values from data
 start_year = min(df["Year"])
@@ -55,7 +26,6 @@ print(df2)
 
 
 # Create first figure: Monthly spending, split by years
-
 df2 = df.groupby(["Year","Month"], as_index=False)['SEK'].aggregate(['sum'])
 df2['Month-Year'] = (df2["Year"]-start_year)*12 + df2["Month"]-start_month
 df2 = df2.set_index(["Month-Year"])
@@ -74,7 +44,6 @@ plt.title("Monthly purchases of Västtrafik tickets in SEK")
 plt.show()
 
 # Create second figure: Yearly spending
-
 plt.figure(figsize=(10,8))
 df3 = df.groupby(["Year"], as_index=False)['SEK'].aggregate('sum')
 ax2 = sb.barplot(data=df3, x='Year', y='SEK', hue="Year", palette=sb.color_palette())
