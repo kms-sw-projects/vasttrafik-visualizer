@@ -26,21 +26,24 @@ def month_from_monthyear(monthyear, year, start_year, start_month):
 # Read CSV file
 df = pd.read_csv("tickets_automated.csv", header=0)
 df['SEK'] = df['SEK'].fillna(0)
+df.head()
 # change date column datatype to datetime
 df['datetime'] = pd.to_datetime(df['datetime'])
 # remove duplicate entries
 df.drop_duplicates("datetime", inplace=True)
+df.head()
 # set datetime column as index
 df.set_index("datetime", inplace=True)
 # drop unnecessary old index
 df.drop("Unnamed: 0", axis=1, inplace=True)
 # show start of the data
-df.head()
+df.head(-100)
 
 # extract startYear and startMonth values from data
 start_year = min(df["Year"])
 start_month = min(df[df["Year"] == start_year]["Month"])
-print(f"The data starts in the year {start_year} and month {start_month}.")
+months_list = list(months[1:])
+print(f"The data starts in the year {start_year} and month {months_list[start_month]}.")
 # print some info over the data
 df.info()
 print(df[-50:-1])
@@ -61,7 +64,7 @@ df2= df2.reindex(list(range(df2.index.min(),df2.index.max()+1)),fill_value=0)
 df2["Year"] = year_from_monthyear(df2.index, df2["Month"], start_year, start_month).astype("int32")
 df2["Month"] = month_from_monthyear(df2.index, df2["Year"], start_year, start_month).astype("int32")
 
-months_list = list(months[1:])
+
 plt.figure(figsize=(12,10))
 ax = sb.barplot(data=df2, x=df2.index, y='sum', hue="Year", palette=sb.color_palette())
 x_labels = [monthyear_from_number(x, months_list, start_year, start_month) for x in df2.index ]
