@@ -29,7 +29,7 @@ print(df2)
 df2 = df.groupby(["Year","Month"], as_index=False)['SEK'].aggregate(['sum'])
 df2['Month-Year'] = (df2["Year"]-start_year)*12 + df2["Month"]-start_month
 df2 = df2.set_index(["Month-Year"])
-# adds empty months (no purchases) as well with 0 in spending
+# adds empty months (no purchases) as well with 0 in SEK column
 df2= df2.reindex(list(range(df2.index.min(),df2.index.max()+1)),fill_value=0)
 df2["Year"] = year_from_monthyear(df2.index, df2["Month"], start_year, start_month).astype("int32")
 df2["Month"] = month_from_monthyear(df2.index, df2["Year"], start_year, start_month).astype("int32")
